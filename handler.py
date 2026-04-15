@@ -15,6 +15,7 @@ from diffusers import (
 import cv2
 import logging
 import traceback
+import requests
 
 # --- Logging Setup ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -78,17 +79,26 @@ def load_models():
         logger.error(traceback.format_exc())
         raise
 
-def decode_base64_image(image_str):
-    if not image_str:
+def load_image(image_input):
+    if not image_input:
         return None
     try:
-        if "base64," in image_str:
-            image_str = image_str.split("base64,")[1]
-        image_bytes = base64.b64decode(image_str)
-        return Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        if image_input.startswith("http"):
+            logger.info(f"Downloading image from URL: {image_input[:50]}...")
+            response = requests.get(image_input, timeout=10)
+            response.raise_for_status()
+            return Image.open(io.BytesIO(response.content)).convert("RGB")
+        else:
+            if "base64," in image_input:
+                image_input = image_input.split("base64,")[1]
+            image_bytes = base64.b64decode(image_input)
+            return Image.open(io.BytesIO(image_bytes)).convert("RGB")
     except Exception as e:
-        logger.error(f"Error decoding base64 image: {str(e)}")
+        logger.error(f"Error loading image: {str(e)}")
         return None
+
+def decode_base64_image(image_str):
+    return load_image(image_str)
 
 def process_mask(mask_str, target_size=(1024, 1024)):
     if not mask_str:
