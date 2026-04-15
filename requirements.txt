@@ -1,0 +1,10 @@
+torch
+torchvision
+runpod
+diffusers
+transformers
+accelerate
+safetensors
+opencv-python-headless
+numpy
+Pillow

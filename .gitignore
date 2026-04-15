@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Models & Media
+models/
+*.safetensors
+*.bin
+*.pt
+*.jpg
+*.png
+
+# OS
+.DS_Store
+
+# RunPod/Local
+test_output.jpg
+setup.sh
+test_local.py
